@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="en">
+>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -16,7 +17,7 @@
       color: #1d4ed8;
       text-align: center;
     }
-    input, button {
+    input, button, select {
       margin: 5px;
       padding: 10px;
       font-size: 1rem;
@@ -47,6 +48,33 @@
       padding: 10px;
       display: block;
     }
+    .unit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    .unit-actions button {
+      margin-left: 5px;
+    }
+    .notes-section {
+      background-color: #f0fdf4;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+    .notes-section ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .notes-section li {
+      padding: 8px;
+      margin: 5px 0;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +90,7 @@
     </div>
   </div>  <div id="dashboard" class="dashboard hidden">
     <h2 id="welcome-text"></h2>
+    <button onclick="signOut()">Log Out</button>
     <input type="text" id="searchInput" onkeyup="searchUnits()" placeholder="Search for a unit..." /><div id="admin-section" class="admin-section hidden">
   <h3>Admin Panel</h3>
   <input type="text" id="unitName" placeholder="Create new unit directory" />
@@ -73,14 +102,26 @@
 <h3>Available Units</h3>
 <ul id="unitList"></ul>
 
+  </div>  <div id="unitView" class="dashboard hidden">
+    <h3 id="selectedUnitTitle"></h3>
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">Upload File</button>
+    <button onclick="signOut()">Log Out</button>
+    <button onclick="backToDashboard()">Back to Units</button><div class="notes-section">
+  <h4>Uploaded Notes (Most Recent First)</h4>
+  <ul id="uploadedFiles"></ul>
+</div>
+
   </div>  <script>
     const ADMIN_EMAIL = "athur2388@gmail.com";
     const ADMIN_PASSWORD = "Makuto2388";
 
     const users = JSON.parse(localStorage.getItem("users")) || {};
     const unitFolders = JSON.parse(localStorage.getItem("unitFolders")) || [];
+    const unitFiles = JSON.parse(localStorage.getItem("unitFiles")) || {}; // Track uploaded files
 
     let currentUser = null;
+    let selectedUnit = null;
 
     function saveUsers() {
       localStorage.setItem("users", JSON.stringify(users));
@@ -88,6 +129,10 @@
 
     function saveUnits() {
       localStorage.setItem("unitFolders", JSON.stringify(unitFolders));
+    }
+
+    function saveFiles() {
+      localStorage.setItem("unitFiles", JSON.stringify(unitFiles));
     }
 
     function signUp() {
@@ -135,6 +180,20 @@
       loadUnitList();
     }
 
+    function signOut() {
+      currentUser = null;
+      selectedUnit = null;
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("unitView").classList.add("hidden");
+      document.getElementById("homepage").classList.remove("hidden");
+    }
+
+    function backToDashboard() {
+      document.getElementById("unitView").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      loadUnitList();
+    }
+
     function createUnitDirectory() {
       const unitName = document.getElementById("unitName").value.trim();
       if (!unitName) return alert("Enter a valid unit name");
@@ -148,13 +207,74 @@
       }
     }
 
+    function deleteUnit(folder) {
+      const confirmDelete = confirm(`Are you sure you want to delete '${folder}'?`);
+      if (!confirmDelete) return;
+      const index = unitFolders.indexOf(folder);
+      if (index > -1) {
+        unitFolders.splice(index, 1);
+        delete unitFiles[folder];
+        saveUnits();
+        saveFiles();
+        loadUnitList();
+      }
+    }
+
     function loadUnitList() {
       const unitList = document.getElementById("unitList");
       unitList.innerHTML = "";
       unitFolders.forEach(folder => {
         const li = document.createElement("li");
-        li.textContent = folder;
+        li.classList.add("unit-item");
+
+        const span = document.createElement("span");
+        span.textContent = folder;
+        span.style.cursor = "pointer";
+        span.onclick = () => openUnit(folder);
+
+        const actionDiv = document.createElement("div");
+        actionDiv.classList.add("unit-actions");
+        if (currentUser === ADMIN_EMAIL) {
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.onclick = () => deleteUnit(folder);
+          actionDiv.appendChild(delBtn);
+        }
+
+        li.appendChild(span);
+        li.appendChild(actionDiv);
         unitList.appendChild(li);
+      });
+    }
+
+    function openUnit(unitName) {
+      selectedUnit = unitName;
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("unitView").classList.remove("hidden");
+      document.getElementById("selectedUnitTitle").innerText = `Unit: ${unitName}`;
+      loadUploadedFiles();
+    }
+
+    function uploadFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file || !selectedUnit) return alert("Select a file and unit.");
+
+      const timestamp = new Date().toISOString();
+      if (!unitFiles[selectedUnit]) unitFiles[selectedUnit] = [];
+      unitFiles[selectedUnit].unshift(`${timestamp} - ${file.name}`);
+      saveFiles();
+      loadUploadedFiles();
+      alert(`Uploaded '${file.name}' to ${selectedUnit}`);
+    }
+
+    function loadUploadedFiles() {
+      const ul = document.getElementById("uploadedFiles");
+      ul.innerHTML = "";
+      const files = unitFiles[selectedUnit] || [];
+      files.forEach(file => {
+        const li = document.createElement("li");
+        li.textContent = file;
+        ul.appendChild(li);
       });
     }
 
