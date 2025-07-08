@@ -35,18 +35,10 @@
       padding: 40px 20px;
       border-radius: 10px;
     }
-  </style>  <!-- Firebase Scripts -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script></head>
+  </style>  <!-- Firebase Scripts -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script></head>
 <body>  <div class="background-books">
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
-  </div>  <div id="auth-section">
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <br />
-    <button onclick="signUp()">Sign Up</button>
-    <button onclick="signIn()">Sign In</button>
-    <button onclick="signOut()">Sign Out</button>
-  </div>  <div class="upload-section" id="upload-section" style="display:none;">
-    <p><strong id="user-email"></strong></p>
+  </div>  <div class="upload-section" id="upload-section">
     <input type="file" id="fileInput" />
     <button onclick="uploadFile()">Upload File</button>
     <button onclick="loadFiles()">Load Uploaded Files</button>
@@ -54,9 +46,6 @@
     <h3>Uploaded Notes</h3>
     <ul id="fileList"></ul>
   </div>  <script>
-    const ADMIN_EMAIL = "athur2388@gmail.com";
-    const ADMIN_PASSWORD = "Makuto2388";
-
     const firebaseConfig = {
       apiKey: "AIzaSyDRkd0dWqI4fiTa-KQDt3ldfe4Wi75A6-A",
       authDomain: "clinical-medicine-2fc52.firebaseapp.com",
@@ -67,44 +56,7 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const storage = firebase.storage();
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("upload-section").style.display = "block";
-        document.getElementById("user-email").innerText = `Logged in as: ${user.email}`;
-        if (user.email === ADMIN_EMAIL) {
-          alert("Admin logged in");
-        }
-      } else {
-        document.getElementById("upload-section").style.display = "none";
-        document.getElementById("user-email").innerText = "";
-      }
-    });
-
-    function signUp() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      if (email === ADMIN_EMAIL) {
-        alert("Admin is already registered. Please sign in.");
-        return;
-      }
-      auth.createUserWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
-    }
-
-    function signIn() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
-    }
-
-    function signOut() {
-      auth.signOut().catch(error => alert(error.message));
-    }
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
