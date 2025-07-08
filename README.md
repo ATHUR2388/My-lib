@@ -1,4 +1,4 @@
-
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -10,23 +10,19 @@
       color: #222;
       margin: 0;
       padding: 20px;
-      text-align: center;
     }
     h1 {
       font-size: 2rem;
       color: #1d4ed8;
+      text-align: center;
     }
     input, button {
       margin: 5px;
       padding: 10px;
       font-size: 1rem;
     }
-    .upload-section, .files-section, .admin-section {
+    .upload-section, .files-section, .admin-section, .dashboard {
       margin-top: 20px;
-    }
-    a {
-      color: #007bff;
-      text-decoration: underline;
     }
     .background-books {
       background-image: url('https://images.unsplash.com/photo-1512820790803-83ca734da794');
@@ -34,40 +30,49 @@
       background-position: center;
       padding: 40px 20px;
       border-radius: 10px;
+      text-align: center;
     }
     .hidden {
       display: none;
     }
+    .dashboard {
+      background-color: #fef9c3;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    #searchInput {
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      padding: 10px;
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <div class="background-books">
+  <div class="background-books" id="homepage">
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
-  </div>  <div id="auth-section">
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <input type="password" id="confirmPassword" placeholder="Confirm Password (Sign Up only)" />
-    <br />
-    <button onclick="signUp()">Sign Up</button>
-    <button onclick="signIn()">Sign In</button>
-    <button onclick="signOut()">Sign Out</button>
-  </div>  <div id="admin-section" class="admin-section hidden">
-    <h3>Admin Panel</h3>
-    <input type="text" id="unitName" placeholder="Create new unit directory" />
-    <button onclick="createUnitDirectory()">Create Unit</button>
-    <h4>Registered Users</h4>
-    <ul id="userList"></ul>
-    <h4>Created Units</h4>
-    <ul id="unitList"></ul>
-  </div>  <div class="upload-section hidden" id="upload-section">
-    <p><strong id="user-email"></strong></p>
-    <input type="file" id="fileInput" />
-    <input type="text" id="unitFolder" placeholder="Enter Unit Folder Name" />
-    <button onclick="uploadFile()">Upload File</button>
-    <button onclick="loadFiles()">Load Uploaded Files</button>
-  </div>  <div class="files-section">
-    <h3>Uploaded Notes</h3>
-    <ul id="fileList"></ul>
+    <div id="auth-section">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password (Sign Up only)" />
+      <br />
+      <button onclick="signUp()">Sign Up</button>
+      <button onclick="signIn()">Sign In</button>
+    </div>
+  </div>  <div id="dashboard" class="dashboard hidden">
+    <h2 id="welcome-text"></h2>
+    <input type="text" id="searchInput" onkeyup="searchUnits()" placeholder="Search for a unit..." /><div id="admin-section" class="admin-section hidden">
+  <h3>Admin Panel</h3>
+  <input type="text" id="unitName" placeholder="Create new unit directory" />
+  <button onclick="createUnitDirectory()">Create Unit</button>
+  <h4>Registered Users</h4>
+  <ul id="userList"></ul>
+</div>
+
+<h3>Available Units</h3>
+<ul id="unitList"></ul>
+
   </div>  <script>
     const ADMIN_EMAIL = "athur2388@gmail.com";
     const ADMIN_PASSWORD = "Makuto2388";
@@ -109,9 +114,10 @@
 
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         currentUser = email;
+        document.getElementById("homepage").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
         document.getElementById("admin-section").classList.remove("hidden");
-        document.getElementById("upload-section").classList.remove("hidden");
-        document.getElementById("user-email").innerText = "Logged in as Admin";
+        document.getElementById("welcome-text").innerText = `Welcome Admin: ${email}`;
         loadUserList();
         loadUnitList();
         return;
@@ -123,25 +129,10 @@
       }
 
       currentUser = email;
-      document.getElementById("upload-section").classList.remove("hidden");
-      document.getElementById("user-email").innerText = `Logged in as: ${email}`;
-    }
-
-    function signOut() {
-      currentUser = null;
-      document.getElementById("upload-section").classList.add("hidden");
-      document.getElementById("admin-section").classList.add("hidden");
-      document.getElementById("user-email").innerText = "";
-    }
-
-    function loadUserList() {
-      const userList = document.getElementById("userList");
-      userList.innerHTML = "";
-      for (const [email, pwd] of Object.entries(users)) {
-        const li = document.createElement("li");
-        li.textContent = `${email}`;
-        userList.appendChild(li);
-      }
+      document.getElementById("homepage").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      document.getElementById("welcome-text").innerText = `Welcome: ${email}`;
+      loadUnitList();
     }
 
     function createUnitDirectory() {
@@ -167,25 +158,24 @@
       });
     }
 
-    function uploadFile() {
-      const file = document.getElementById("fileInput").files[0];
-      const unitFolder = document.getElementById("unitFolder").value.trim();
-      if (!file || !unitFolder) return alert("Select a file and enter unit folder");
-
-      const fakeURL = `https://storage.fake-firebase.com/notes/${unitFolder}/${file.name}`;
-      alert(`File '${file.name}' uploaded to '${unitFolder}' (simulated).`);
+    function loadUserList() {
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
+      for (const email in users) {
+        const li = document.createElement("li");
+        li.textContent = email;
+        userList.appendChild(li);
+      }
     }
 
-    function loadFiles() {
-      const fileList = document.getElementById("fileList");
-      fileList.innerHTML = "Example notes: ";
-
-      const exampleFiles = ["unit1_note.pdf", "unit2_slides.pptx", "unit3_outline.docx"];
-      exampleFiles.forEach(file => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="#">${file}</a>`;
-        fileList.appendChild(li);
-      });
+    function searchUnits() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const list = document.getElementById("unitList").getElementsByTagName("li");
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(input) ? "" : "none";
+      }
     }
   </script></body>
 </html>
