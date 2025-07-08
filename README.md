@@ -21,7 +21,7 @@
       padding: 10px;
       font-size: 1rem;
     }
-    .upload-section, .files-section {
+    .upload-section, .files-section, .admin-section {
       margin-top: 20px;
     }
     a {
@@ -35,55 +35,132 @@
       padding: 40px 20px;
       border-radius: 10px;
     }
-  </style>  <!-- Firebase Scripts -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script></head>
-<body>  <div class="background-books">
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-books">
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
-  </div>  <div class="upload-section" id="upload-section">
+  </div>  <div id="auth-section">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password (Sign Up only)" />
+    <br />
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="signIn()">Sign In</button>
+    <button onclick="signOut()">Sign Out</button>
+  </div>  <div id="admin-section" class="admin-section hidden">
+    <h3>Admin Panel</h3>
+    <input type="text" id="unitName" placeholder="Create new unit directory" />
+    <button onclick="createUnitDirectory()">Create Unit</button>
+    <h4>Registered Users</h4>
+    <ul id="userList"></ul>
+  </div>  <div class="upload-section hidden" id="upload-section">
+    <p><strong id="user-email"></strong></p>
     <input type="file" id="fileInput" />
+    <input type="text" id="unitFolder" placeholder="Enter Unit Folder Name" />
     <button onclick="uploadFile()">Upload File</button>
     <button onclick="loadFiles()">Load Uploaded Files</button>
   </div>  <div class="files-section">
     <h3>Uploaded Notes</h3>
     <ul id="fileList"></ul>
   </div>  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDRkd0dWqI4fiTa-KQDt3ldfe4Wi75A6-A",
-      authDomain: "clinical-medicine-2fc52.firebaseapp.com",
-      projectId: "clinical-medicine-2fc52",
-      storageBucket: "clinical-medicine-2fc52.appspot.com",
-      messagingSenderId: "924963533641",
-      appId: "1:924963533641:android:88286d9ff4c0f89b652098"
-    };
+    const ADMIN_EMAIL = "athur2388@gmail.com";
+    const ADMIN_PASSWORD = "Makuto2388";
 
-    firebase.initializeApp(firebaseConfig);
-    const storage = firebase.storage();
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+
+    let currentUser = null;
+
+    function saveUsers() {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function signUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (users[email]) {
+        alert("User already exists. Please sign in.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+      users[email] = password;
+      saveUsers();
+      alert("Sign up successful. Please sign in.");
+    }
+
+    function signIn() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        currentUser = email;
+        document.getElementById("admin-section").classList.remove("hidden");
+        document.getElementById("upload-section").classList.remove("hidden");
+        document.getElementById("user-email").innerText = "Logged in as Admin";
+        loadUserList();
+        return;
+      }
+
+      if (!users[email] || users[email] !== password) {
+        alert("Wrong password or user does not exist.");
+        return;
+      }
+
+      currentUser = email;
+      document.getElementById("upload-section").classList.remove("hidden");
+      document.getElementById("user-email").innerText = `Logged in as: ${email}`;
+    }
+
+    function signOut() {
+      currentUser = null;
+      document.getElementById("upload-section").classList.add("hidden");
+      document.getElementById("admin-section").classList.add("hidden");
+      document.getElementById("user-email").innerText = "";
+    }
+
+    function loadUserList() {
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
+      for (const [email, pwd] of Object.entries(users)) {
+        const li = document.createElement("li");
+        li.textContent = `${email}`;
+        userList.appendChild(li);
+      }
+    }
+
+    function createUnitDirectory() {
+      const unitName = document.getElementById("unitName").value.trim();
+      if (!unitName) return alert("Enter a valid unit name");
+      alert(`Unit folder '${unitName}' created.`); // Simulated
+    }
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
-      if (!file) return alert("Please select a file");
-      const storageRef = storage.ref("notes/" + file.name);
-      storageRef.put(file).then(() => {
-        alert("File uploaded successfully!");
-      }).catch(err => alert(err.message));
+      const unitFolder = document.getElementById("unitFolder").value.trim();
+      if (!file || !unitFolder) return alert("Select a file and enter unit folder");
+
+      const fakeURL = `https://storage.fake-firebase.com/notes/${unitFolder}/${file.name}`;
+      alert(`File '${file.name}' uploaded to '${unitFolder}' (simulated).`);
     }
 
     function loadFiles() {
-      const listRef = storage.ref("notes/");
       const fileList = document.getElementById("fileList");
-      fileList.innerHTML = "Loading...";
+      fileList.innerHTML = "Example notes: ";
 
-      listRef.listAll()
-        .then(res => {
-          fileList.innerHTML = "";
-          res.items.forEach(itemRef => {
-            itemRef.getDownloadURL().then(url => {
-              const li = document.createElement("li");
-              li.innerHTML = `<a href="${url}" target="_blank">${itemRef.name}</a>`;
-              fileList.appendChild(li);
-            });
-          });
-        })
-        .catch(err => alert("Failed to list files: " + err.message));
+      const exampleFiles = ["unit1_note.pdf", "unit2_slides.pptx", "unit3_outline.docx"];
+      exampleFiles.forEach(file => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="#">${file}</a>`;
+        fileList.appendChild(li);
+      });
     }
   </script></body>
 </html>
