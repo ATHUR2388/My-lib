@@ -57,6 +57,8 @@
     <button onclick="createUnitDirectory()">Create Unit</button>
     <h4>Registered Users</h4>
     <ul id="userList"></ul>
+    <h4>Created Units</h4>
+    <ul id="unitList"></ul>
   </div>  <div class="upload-section hidden" id="upload-section">
     <p><strong id="user-email"></strong></p>
     <input type="file" id="fileInput" />
@@ -71,11 +73,16 @@
     const ADMIN_PASSWORD = "Makuto2388";
 
     const users = JSON.parse(localStorage.getItem("users")) || {};
+    const unitFolders = JSON.parse(localStorage.getItem("unitFolders")) || [];
 
     let currentUser = null;
 
     function saveUsers() {
       localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function saveUnits() {
+      localStorage.setItem("unitFolders", JSON.stringify(unitFolders));
     }
 
     function signUp() {
@@ -106,6 +113,7 @@
         document.getElementById("upload-section").classList.remove("hidden");
         document.getElementById("user-email").innerText = "Logged in as Admin";
         loadUserList();
+        loadUnitList();
         return;
       }
 
@@ -139,7 +147,24 @@
     function createUnitDirectory() {
       const unitName = document.getElementById("unitName").value.trim();
       if (!unitName) return alert("Enter a valid unit name");
-      alert(`Unit folder '${unitName}' created.`); // Simulated
+      if (!unitFolders.includes(unitName)) {
+        unitFolders.push(unitName);
+        saveUnits();
+        loadUnitList();
+        alert(`Unit folder '${unitName}' created.`);
+      } else {
+        alert("This unit already exists.");
+      }
+    }
+
+    function loadUnitList() {
+      const unitList = document.getElementById("unitList");
+      unitList.innerHTML = "";
+      unitFolders.forEach(folder => {
+        const li = document.createElement("li");
+        li.textContent = folder;
+        unitList.appendChild(li);
+      });
     }
 
     function uploadFile() {
