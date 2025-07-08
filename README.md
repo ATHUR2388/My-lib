@@ -1,5 +1,4 @@
 
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -94,14 +93,23 @@
 <body>
   <div class="background-books" id="homepage">
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
-    <div id="auth-section">
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <input type="password" id="confirmPassword" placeholder="Confirm Password (Sign Up only)" />
-      <br />
-      <button onclick="signUp()">Sign Up</button>
-      <button onclick="signIn()">Sign In</button>
-    </div>
+    <button onclick="showLogin()">Log In</button>
+    <button onclick="showSignUp()">Sign Up</button>
+  </div>  <div class="hidden" id="login-section">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email" />
+    <input type="password" id="login-password" placeholder="Password" />
+    <br />
+    <button onclick="signIn()">Login</button>
+    <button onclick="backHome()">Back</button>
+  </div>  <div class="hidden" id="signup-section">
+    <h2>Sign Up</h2>
+    <input type="email" id="signup-email" placeholder="Email" />
+    <input type="password" id="signup-password" placeholder="Password" />
+    <input type="password" id="signup-confirm" placeholder="Confirm Password" />
+    <br />
+    <button onclick="signUp()">Register</button>
+    <button onclick="backHome()">Back</button>
   </div>  <div id="dashboard" class="dashboard hidden">
     <h2 id="welcome-text"></h2>
     <button onclick="signOut()">Log Out</button>
@@ -131,41 +139,50 @@
   </div>  <script>
     const ADMIN_EMAIL = "athur2388@gmail.com";
     const ADMIN_PASSWORD = "Makuto2388";
-
     const users = JSON.parse(localStorage.getItem("users")) || {};
     const unitFolders = JSON.parse(localStorage.getItem("unitFolders")) || [];
     const unitFiles = JSON.parse(localStorage.getItem("unitFiles")) || {};
-
     let currentUser = null;
     let selectedUnit = null;
 
-    function saveUsers() {
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-    function saveUnits() {
-      localStorage.setItem("unitFolders", JSON.stringify(unitFolders));
-    }
-    function saveFiles() {
-      localStorage.setItem("unitFiles", JSON.stringify(unitFiles));
+    function showLogin() {
+      document.getElementById("homepage").classList.add("hidden");
+      document.getElementById("login-section").classList.remove("hidden");
     }
 
+    function showSignUp() {
+      document.getElementById("homepage").classList.add("hidden");
+      document.getElementById("signup-section").classList.remove("hidden");
+    }
+
+    function backHome() {
+      document.getElementById("homepage").classList.remove("hidden");
+      document.getElementById("login-section").classList.add("hidden");
+      document.getElementById("signup-section").classList.add("hidden");
+    }
+
+    function saveUsers() { localStorage.setItem("users", JSON.stringify(users)); }
+    function saveUnits() { localStorage.setItem("unitFolders", JSON.stringify(unitFolders)); }
+    function saveFiles() { localStorage.setItem("unitFiles", JSON.stringify(unitFiles)); }
+
     function signUp() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-      if (users[email]) return alert("User already exists. Please sign in.");
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const confirmPassword = document.getElementById("signup-confirm").value;
+      if (users[email]) return alert("User already exists.");
       if (password !== confirmPassword) return alert("Passwords do not match.");
       users[email] = password;
       saveUsers();
-      alert("Sign up successful. Please sign in.");
+      alert("Sign up successful. Please login.");
+      backHome();
     }
 
     function signIn() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         currentUser = email;
-        document.getElementById("homepage").classList.add("hidden");
+        document.getElementById("login-section").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("hidden");
         document.getElementById("admin-section").classList.remove("hidden");
         document.getElementById("welcome-text").innerText = `Welcome Admin: ${email}`;
@@ -175,7 +192,7 @@
       }
       if (!users[email] || users[email] !== password) return alert("Wrong password or user does not exist.");
       currentUser = email;
-      document.getElementById("homepage").classList.add("hidden");
+      document.getElementById("login-section").classList.add("hidden");
       document.getElementById("dashboard").classList.remove("hidden");
       document.getElementById("welcome-text").innerText = `Welcome: ${email}`;
       document.getElementById("admin-section").classList.add("hidden");
@@ -203,8 +220,8 @@
         unitFolders.push(unitName);
         saveUnits();
         loadUnitList();
-        alert(`Unit folder '${unitName}' created.`);
-      } else alert("This unit already exists.");
+        alert(`Unit '${unitName}' created.`);
+      } else alert("Unit already exists.");
     }
 
     function deleteUnit(folder) {
@@ -255,10 +272,10 @@
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
-      if (!file || !selectedUnit) return alert("Select a file and unit.");
+      if (!file || !selectedUnit) return alert("Select file and unit.");
       const timestamp = new Date().toISOString();
       if (!unitFiles[selectedUnit]) unitFiles[selectedUnit] = [];
-      unitFiles[selectedUnit].unshift({ name: file.name, timestamp });
+      unitFiles[selectedUnit].unshift({ name: file.name, timestamp, url: URL.createObjectURL(file) });
       saveFiles();
       loadUploadedFiles();
       alert(`Uploaded '${file.name}' to ${selectedUnit}`);
@@ -278,13 +295,32 @@
       document.getElementById("notesCount").innerText = files.length;
       files.forEach((file, index) => {
         const li = document.createElement("li");
-        li.innerHTML = `${index + 1}. ${file.timestamp} - ${file.name}`;
+        const a = document.createElement("a");
+        a.href = file.url;
+        a.target = "_blank";
+        a.textContent = `${index + 1}. ${file.timestamp} - ${file.name}`;
+
+        li.appendChild(a);
+
+        const actions = document.createElement("div");
+        const downloadBtn = document.createElement("button");
+        downloadBtn.textContent = "Download";
+        downloadBtn.onclick = () => {
+          const link = document.createElement('a');
+          link.href = file.url;
+          link.download = file.name;
+          link.click();
+        };
+        actions.appendChild(downloadBtn);
+
         if (currentUser === ADMIN_EMAIL) {
           const delBtn = document.createElement("button");
           delBtn.textContent = "Delete";
           delBtn.onclick = () => deleteNote(index);
-          li.appendChild(delBtn);
+          actions.appendChild(delBtn);
         }
+
+        li.appendChild(actions);
         ul.appendChild(li);
       });
     }
