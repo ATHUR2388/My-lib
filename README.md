@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -36,37 +35,27 @@
       padding: 40px 20px;
       border-radius: 10px;
     }
-  </style>
-
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-</head>
-<body>
-  <div class="background-books">
+  </style>  <!-- Firebase Scripts -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script></head>
+<body>  <div class="background-books">
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
-  </div>
-
-  <div id="auth-section">
-    <button onclick="googleSignIn()">Sign In with Google</button>
+  </div>  <div id="auth-section">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <br />
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="signIn()">Sign In</button>
     <button onclick="signOut()">Sign Out</button>
-  </div>
-
-  <div class="upload-section" id="upload-section" style="display:none;">
+  </div>  <div class="upload-section" id="upload-section" style="display:none;">
     <p><strong id="user-email"></strong></p>
     <input type="file" id="fileInput" />
     <button onclick="uploadFile()">Upload File</button>
     <button onclick="loadFiles()">Load Uploaded Files</button>
-  </div>
-
-  <div class="files-section">
+  </div>  <div class="files-section">
     <h3>Uploaded Notes</h3>
     <ul id="fileList"></ul>
-  </div>
-
-  <script>
+  </div>  <script>
     const ADMIN_EMAIL = "athur2388@gmail.com";
+    const ADMIN_PASSWORD = "Makuto2388";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDRkd0dWqI4fiTa-KQDt3ldfe4Wi75A6-A",
@@ -94,13 +83,23 @@
       }
     });
 
-    function googleSignIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(result => {
-          alert(`Signed in as ${result.user.email}`);
-        })
-        .catch(error => alert("Sign-in failed: " + error.message));
+    function signUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (email === ADMIN_EMAIL) {
+        alert("Admin is already registered. Please sign in.");
+        return;
+      }
+      auth.createUserWithEmailAndPassword(email, password)
+        .catch(error => alert(error.message));
+    }
+
+    function signIn() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(error => alert(error.message));
     }
 
     function signOut() {
@@ -134,6 +133,5 @@
         })
         .catch(err => alert("Failed to list files: " + err.message));
     }
-  </script>
-</body>
+  </script></body>
 </html>
