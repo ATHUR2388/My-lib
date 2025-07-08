@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en">
->
+
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -12,15 +12,26 @@
       margin: 0;
       padding: 20px;
     }
-    h1 {
-      font-size: 2rem;
-      color: #1d4ed8;
+    h1, h2, h3, h4 {
       text-align: center;
+      color: #1d4ed8;
     }
     input, button, select {
       margin: 5px;
       padding: 10px;
       font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2563eb;
     }
     .upload-section, .files-section, .admin-section, .dashboard {
       margin-top: 20px;
@@ -55,7 +66,7 @@
       padding: 8px;
       border-bottom: 1px solid #ccc;
     }
-    .unit-actions button {
+    .unit-actions button, .note-actions button {
       margin-left: 5px;
     }
     .notes-section {
@@ -74,6 +85,9 @@
       background-color: #ffffff;
       border: 1px solid #ddd;
       border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   </style>
 </head>
@@ -99,16 +113,18 @@
   <ul id="userList"></ul>
 </div>
 
-<h3>Available Units</h3>
+<h3>Available Units (<span id="unitCount"></span>)</h3>
 <ul id="unitList"></ul>
 
   </div>  <div id="unitView" class="dashboard hidden">
     <h3 id="selectedUnitTitle"></h3>
-    <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">Upload File</button>
+    <div id="uploadControls" class="hidden">
+      <input type="file" id="fileInput" />
+      <button onclick="uploadFile()">Upload File</button>
+    </div>
     <button onclick="signOut()">Log Out</button>
     <button onclick="backToDashboard()">Back to Units</button><div class="notes-section">
-  <h4>Uploaded Notes (Most Recent First)</h4>
+  <h4>Uploaded Notes (<span id="notesCount"></span>)</h4>
   <ul id="uploadedFiles"></ul>
 </div>
 
@@ -118,7 +134,7 @@
 
     const users = JSON.parse(localStorage.getItem("users")) || {};
     const unitFolders = JSON.parse(localStorage.getItem("unitFolders")) || [];
-    const unitFiles = JSON.parse(localStorage.getItem("unitFiles")) || {}; // Track uploaded files
+    const unitFiles = JSON.parse(localStorage.getItem("unitFiles")) || {};
 
     let currentUser = null;
     let selectedUnit = null;
@@ -126,11 +142,9 @@
     function saveUsers() {
       localStorage.setItem("users", JSON.stringify(users));
     }
-
     function saveUnits() {
       localStorage.setItem("unitFolders", JSON.stringify(unitFolders));
     }
-
     function saveFiles() {
       localStorage.setItem("unitFiles", JSON.stringify(unitFiles));
     }
@@ -139,15 +153,8 @@
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
-
-      if (users[email]) {
-        alert("User already exists. Please sign in.");
-        return;
-      }
-      if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
+      if (users[email]) return alert("User already exists. Please sign in.");
+      if (password !== confirmPassword) return alert("Passwords do not match.");
       users[email] = password;
       saveUsers();
       alert("Sign up successful. Please sign in.");
@@ -156,7 +163,6 @@
     function signIn() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         currentUser = email;
         document.getElementById("homepage").classList.add("hidden");
@@ -167,16 +173,12 @@
         loadUnitList();
         return;
       }
-
-      if (!users[email] || users[email] !== password) {
-        alert("Wrong password or user does not exist.");
-        return;
-      }
-
+      if (!users[email] || users[email] !== password) return alert("Wrong password or user does not exist.");
       currentUser = email;
       document.getElementById("homepage").classList.add("hidden");
       document.getElementById("dashboard").classList.remove("hidden");
       document.getElementById("welcome-text").innerText = `Welcome: ${email}`;
+      document.getElementById("admin-section").classList.add("hidden");
       loadUnitList();
     }
 
@@ -202,14 +204,11 @@
         saveUnits();
         loadUnitList();
         alert(`Unit folder '${unitName}' created.`);
-      } else {
-        alert("This unit already exists.");
-      }
+      } else alert("This unit already exists.");
     }
 
     function deleteUnit(folder) {
-      const confirmDelete = confirm(`Are you sure you want to delete '${folder}'?`);
-      if (!confirmDelete) return;
+      if (!confirm(`Delete '${folder}'?`)) return;
       const index = unitFolders.indexOf(folder);
       if (index > -1) {
         unitFolders.splice(index, 1);
@@ -223,15 +222,13 @@
     function loadUnitList() {
       const unitList = document.getElementById("unitList");
       unitList.innerHTML = "";
-      unitFolders.forEach(folder => {
+      unitFolders.forEach((folder, i) => {
         const li = document.createElement("li");
         li.classList.add("unit-item");
-
         const span = document.createElement("span");
-        span.textContent = folder;
+        span.textContent = `${i + 1}. ${folder}`;
         span.style.cursor = "pointer";
         span.onclick = () => openUnit(folder);
-
         const actionDiv = document.createElement("div");
         actionDiv.classList.add("unit-actions");
         if (currentUser === ADMIN_EMAIL) {
@@ -240,11 +237,11 @@
           delBtn.onclick = () => deleteUnit(folder);
           actionDiv.appendChild(delBtn);
         }
-
         li.appendChild(span);
         li.appendChild(actionDiv);
         unitList.appendChild(li);
       });
+      document.getElementById("unitCount").innerText = unitFolders.length;
     }
 
     function openUnit(unitName) {
@@ -252,28 +249,42 @@
       document.getElementById("dashboard").classList.add("hidden");
       document.getElementById("unitView").classList.remove("hidden");
       document.getElementById("selectedUnitTitle").innerText = `Unit: ${unitName}`;
+      document.getElementById("uploadControls").classList.toggle("hidden", currentUser !== ADMIN_EMAIL);
       loadUploadedFiles();
     }
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
       if (!file || !selectedUnit) return alert("Select a file and unit.");
-
       const timestamp = new Date().toISOString();
       if (!unitFiles[selectedUnit]) unitFiles[selectedUnit] = [];
-      unitFiles[selectedUnit].unshift(`${timestamp} - ${file.name}`);
+      unitFiles[selectedUnit].unshift({ name: file.name, timestamp });
       saveFiles();
       loadUploadedFiles();
       alert(`Uploaded '${file.name}' to ${selectedUnit}`);
+    }
+
+    function deleteNote(index) {
+      if (!selectedUnit || !confirm("Delete this note?")) return;
+      unitFiles[selectedUnit].splice(index, 1);
+      saveFiles();
+      loadUploadedFiles();
     }
 
     function loadUploadedFiles() {
       const ul = document.getElementById("uploadedFiles");
       ul.innerHTML = "";
       const files = unitFiles[selectedUnit] || [];
-      files.forEach(file => {
+      document.getElementById("notesCount").innerText = files.length;
+      files.forEach((file, index) => {
         const li = document.createElement("li");
-        li.textContent = file;
+        li.innerHTML = `${index + 1}. ${file.timestamp} - ${file.name}`;
+        if (currentUser === ADMIN_EMAIL) {
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.onclick = () => deleteNote(index);
+          li.appendChild(delBtn);
+        }
         ul.appendChild(li);
       });
     }
@@ -298,4 +309,3 @@
       }
     }
   </script></body>
-</html>
