@@ -1,4 +1,42 @@
-<!DOCTYPE html>
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { auth } from "./firebase.js";window.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("adminLoginForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("adminEmail").value;
+    const password = document.getElementById("adminPassword").value;
+
+    if (email !== "athur2388@gmail.com" || password !== "Makuto2388") {
+      alert("Incorrect admin credentials.");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "admin-dashboard.html";
+    } catch (error) {
+      alert("Login failed: " + error.message);
+    }
+  });
+});
+
+  </script>
+</head><body>
+  <main>
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <input type="email" id="adminEmail" placeholder="Admin Email" required />
+      <input type="password" id="adminPassword" placeholder="Admin Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </main>
+</body></html>
 <html lang="en">
 
 <head>
