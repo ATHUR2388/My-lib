@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -95,14 +95,18 @@
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
     <button onclick="showLogin()">Log In</button>
     <button onclick="showSignUp()">Sign Up (Admin Only)</button>
-  </div>  <div class="hidden" id="login-section">
+  </div>
+
+  <div class="hidden" id="login-section">
     <h2>Login</h2>
     <input type="email" id="login-email" placeholder="Email" />
     <input type="password" id="login-password" placeholder="Password" />
     <br />
     <button onclick="signIn()">Login</button>
     <button onclick="backHome()">Back</button>
-  </div>  <div class="hidden" id="signup-section">
+  </div>
+
+  <div class="hidden" id="signup-section">
     <h2>Admin Sign Up</h2>
     <input type="email" id="signup-email" placeholder="Email" />
     <input type="password" id="signup-password" placeholder="Password" />
@@ -110,5 +114,8 @@
     <br />
     <button onclick="signUp()">Register</button>
     <button onclick="backHome()">Back</button>
-  </div>  <!-- (The rest of the code stays the same) --></body>
-</html>
+  </div>
+
+  <!-- (The rest of the code stays the same) -->
+</body>
+
