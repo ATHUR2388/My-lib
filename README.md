@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,14 +102,18 @@
     <h1>WELCOME TO MAKUTO'S LIBRARY</h1>
     <button onclick="showLogin()">Log In</button>
     <button onclick="showRegister()">Register</button>
-  </div>  <div class="hidden" id="login-section">
+  </div>
+
+  <div class="hidden" id="login-section">
     <h2>Login</h2>
     <input type="email" id="login-email" placeholder="Email" />
     <input type="password" id="login-password" placeholder="Password" />
     <br />
     <button onclick="signIn()">Login</button>
     <button onclick="backHome()">Back</button>
-  </div>  <div class="hidden" id="register-section">
+  </div>
+
+  <div class="hidden" id="register-section">
     <h2>Register</h2>
     <input type="email" id="register-email" placeholder="Email" />
     <input type="password" id="register-password" placeholder="Password" />
@@ -116,7 +121,11 @@
     <br />
     <button onclick="registerUser()">Register</button>
     <button onclick="backHome()">Back</button>
-  </div>  <!-- Dashboard and other content stay unchanged -->  <script>
+  </div>
+
+  <!-- Dashboard and other content stay unchanged -->
+
+  <script>
     const ADMIN_EMAIL = "athur2388@gmail.com";
     const ADMIN_PASSWORD = "Makuto2388";
     const users = JSON.parse(localStorage.getItem("users")) || {};
@@ -182,5 +191,6 @@
         alert("Wrong email or password");
       }
     }
-  </script></body>
+  </script>
+</body>
 </html>
