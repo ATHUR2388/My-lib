@@ -1,145 +1,107 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WELCOME TO MY LIBRARY</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
     header {
-      background-color: #003366;
-      color: #fff;
-      text-align: center;
-      padding: 2rem;
-      border-bottom: 4px solid #0055a5;
-    }
-    header h1 {
-      font-size: 2.5rem;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin: 1rem;
-    }
-    nav a {
-      background-color: #0055a5;
-      color: #fff;
-      padding: 0.75rem 1.5rem;
-      border-radius: 5px;
-      text-decoration: none;
-      border: 1px solid #003366;
-      font-weight: bold;
-    }
-    nav a:hover {
-      background-color: #003366;
-    }
-    .footer {
-      text-align: center;
-      padding: 2rem;
-      background-color: #003366;
+      background-color: #007bff;
       color: white;
-      border-top: 4px solid #0055a5;
-      margin-top: 2rem;
-    }
-    .search-bar {
+      padding: 15px;
       display: flex;
-      justify-content: flex-end;
-      padding: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #0056b3;
     }
-    .search-bar input {
-      padding: 0.5rem;
-      width: 250px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .arrows {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+    .admin-info {
       display: flex;
+      align-items: center;
       gap: 10px;
     }
-    .arrows button {
-      padding: 0.5rem 0.8rem;
-      border: none;
-      background: #0055a5;
-      color: white;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .section {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: white;
-    }
-    .section h2 {
-      margin-bottom: 1rem;
-      color: #003366;
-    }
-    .button {
-      background-color: #0055a5;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 5px;
-      margin-top: 1rem;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #003366;
-    }
-    .profile-pic {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
+    .admin-info img {
+      width: 50px;
+      height: 50px;
       object-fit: cover;
-      border: 2px solid #003366;
+      border-radius: 50%;
+      border: 2px solid white;
     }
-    .top-right {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      text-align: right;
+    main {
+      padding: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin-bottom: 30px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
   <header>
+    <h2>Admin Dashboard</h2>
+    <div class="admin-info" id="adminDisplay">
+      <!-- Will be filled with admin details -->
+    </div>
+  </header>  <main>
+    <form id="adminProfileForm">
+      <h3>Create Your Admin Account</h3>
+      <input type="text" id="name1" placeholder="First Name" required />
+      <input type="text" id="name2" placeholder="Last Name" required />
+      <input type="text" id="contact" placeholder="Contact" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="file" id="photo" accept="image/*" />
+      <button type="submit">Save Profile</button>
+    </form>
+  </main>  <script>
+    const form = document.getElementById('adminProfileForm');
+    const display = document.getElementById('adminDisplay');
+
+    form.addEventListener('submit
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WELCOME TO MY LIBRARY</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="main-header">
     <h1>WELCOME TO MY LIBRARY</h1>
-  </header>  <div class="top-right" id="user-info">
-    <!-- Admin or Member info shown here -->
-  </div>  <div class="search-bar">
-    <input type="text" placeholder="Search...">
-  </div>  <nav>
-    <a href="admin-login.html">Admin Sign In</a>
-    <a href="member-signup.html">Member Sign Up</a>
-  </nav>  <div class="section">
-    <h2>Library Features</h2>
-    <ul>
-      <li>Admin login with fixed credentials</li>
-      <li>Admin creates member accounts (picture, name, contact, email)</li>
-      <li>Members sign up with email, password, optional circular photo</li>
-      <li>Admin dashboard: create folders by year → semester → unit</li>
-      <li>Upload and manage notes: PDF, DOC, PPT, TXT</li>
-      <li>Notes editable by admin, downloadable/readable by members</li>
-      <li>Search available on all pages</li>
-      <li>Cloud/online-only file storage and educational links section</li>
-      <li>Registered member list with full account details</li>
-      <li>Navigation using ← × → buttons</li>
-    </ul>
-    <button class="button" onclick="alert('Coming soon: Full functionality')">Explore Dashboard</button>
-  </div>  <div class="footer">
-    created by athur @2024
-  </div>  <div class="arrows">
-    <button onclick="history.back()">←</button>
-    <button onclick="window.close()">×</button>
-    <button onclick="history.forward()">→</button>
-  </div>
-</body>
+    <nav>
+      <button onclick="location.href='admin-login.html'">Admin Login</button>
+      <button onclick="location.href='member-signup.html'">Member Sign Up</button>
+      <input type="search" placeholder="Search...">
+    </nav>
+  </header>  <main>
+    <section>
+      <h2>Explore Educational Resources</h2>
+      <p>Sign in as an admin or register as a member to access and upload course notes.</p>
+    </section>
+  </main>  <footer>
+    <p>Created by athur @2024</p>
+  </footer>
+
 </html>
