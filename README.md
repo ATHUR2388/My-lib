@@ -287,5 +287,119 @@
 
     loadYearSelection();
   </script>
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f9ff;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: #4a90e2;
+    color: white;
+    padding: 1em;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .container {
+    padding: 2em;
+    max-width: 1000px;
+    margin: auto;
+  }
+  .section {
+    margin: 1em 0;
+    border: 2px solid #4a90e2;
+    border-radius: 15px;
+    padding: 1em;
+    background: #ffffff;
+  }
+  button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 1em;
+    flex-shrink: 0;
+  }
+  button:hover {
+    background-color: #357ab8;
+  }
+  input, select {
+    padding: 0.5em;
+    margin: 0.5em 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1em;
+  }
+  .folder-button {
+    display: inline-block;
+    margin: 5px 5px 0 0;
+    padding: 8px 12px;
+    background-color: #6cbf84;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  .folder-button:hover {
+    background-color: #57a36f;
+  }
+  iframe.viewer {
+    width: 100%;
+    height: 500px;
+    border: 2px solid #ccc;
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+  .note-item {
+    margin-bottom: 10px;
+    word-wrap: break-word;
+  }
+  .nav-arrows {
+    display: flex;
+    justify-content: space-between;
+    margin: 1em 0;
+    flex-wrap: wrap;
+  }
+  .nav-arrows button {
+    font-size: 18px;
+    padding: 10px;
+    width: 60px;
+    margin: 5px;
+  }
+
+  @media (max-width: 600px) {
+    header {
+      font-size: 20px;
+      padding: 0.8em;
+    }
+    .container {
+      padding: 1em;
+    }
+    button, .folder-button {
+      font-size: 0.9em;
+      padding: 8px 15px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .nav-arrows {
+      flex-direction: column;
+      align-items: center;
+    }
+    iframe.viewer {
+      height: 300px;
+    }
+  }
+</style>
+
 </body>
 </html>
